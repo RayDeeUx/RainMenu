@@ -381,15 +381,17 @@ class RainMenuLayer : public CCLayer {
 
 		this->schedule(schedule_selector(RainMenuLayer::startLightning), 10);
 
+		
 		auto exitMenu = CCMenu::create();
 		exitMenu->setPosition({ 0.f, 0.f });
 		this->addChild(exitMenu, EXIT_MENU_Z_ORDER);
 
-		auto exitLabel = CCLabelBMFont::create("exit", "lemonmilk.fnt"_spr);
+		auto exitLabel = CCLabelBMFont::create("exit", "Lemonmilk.fnt"_spr);
 		exitLabel->setOpacity(50);
 		auto exitBtn = CCMenuItemSpriteExtra::create(exitLabel, this, menu_selector(RainMenuLayer::onQuit));
 		exitBtn->setPosition({ 25.f, size.height - 20.f });
 		exitMenu->addChild(exitBtn);
+		
 
 		return true;
 	}
