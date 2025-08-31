@@ -8,6 +8,15 @@
 #include "./ParticleSystemBuilder.h"
 #include <Geode/ui/GeodeUI.hpp>
 
+#define SCALE_POS_FROM_UHD(x, y, uhdParentSize, parentSize) { \
+    (x) / (uhdParentSize).width * (parentSize).width,         \
+    (y) / (uhdParentSize).height * (parentSize).height        \
+}
+
+#define SCALE_VAL_FROM_UHD(v, uhdParentSize, parentSize) (   \
+    (v) / (uhdParentSize).height * (parentSize).height       \
+)
+
 CCPoint convertChildPositionFromUHD(CCPoint childPositionInUHD, CCSize parentSizeInUHD, CCNode* parent) {
 	return { childPositionInUHD.x / parentSizeInUHD.width * parent->getContentWidth(), childPositionInUHD.y / parentSizeInUHD.height * parent->getContentHeight() };
 }
@@ -25,7 +34,8 @@ class RainMenuLayer : public CCLayer {
 		RAIN_MIDDLE_Z_ORDER = 5,
 		CLOUD_LAYER_ORDER = 6,
 		FOREGROUND_Z_ORDER = 7,
-		RAIN_FRONT_Z_ORDER = 8
+		RAIN_FRONT_Z_ORDER = 8,
+		EXIT_MENU_Z_ORDER = 9
 	};
 
 	CCSprite* bg;
@@ -54,6 +64,9 @@ class RainMenuLayer : public CCLayer {
 		bg->setAnchorPoint({ 0.5, 0 });
 		this->addChild(bg, BG_Z_ORDER);
 
+		auto bgSize = bg->getContentSize();
+		CCSize bgUhdSize = { 480.f, 270.f };
+
 		bgOverlay = CCLayerColor::create(ccc4(255, 255, 255, 200), size.width, size.height);
 		bgOverlay->setBlendFunc({ GL_SRC_ALPHA, GL_ONE });
 		bgOverlay->setOpacity(0);
@@ -70,7 +83,8 @@ class RainMenuLayer : public CCLayer {
 		
 		foreground = CCSprite::create("foreground.png"_spr);
 		scaleToFit(foreground, size, ScaleMode::Contain);
-		foreground->setPosition(size / 2.f);
+		foreground->setPosition({0.f, 0.f});
+		foreground->setAnchorPoint({ 0.f, 0.f });
 		this->addChild(foreground, FOREGROUND_Z_ORDER);
 
 		tree = CCSprite::create("tree.png"_spr);
@@ -163,8 +177,8 @@ class RainMenuLayer : public CCLayer {
 
 
 	lightning = FrameAnimatedSprite::createFromPlist("Lightning.plist"_spr);
-	lightning->setPosition(convertChildPositionFromUHD({227.f, 270.f}, {480.f, 270.f}, bg));
-	lightning->setScale(convertChildScaleFromUHD(0.425, 270.f, bg));
+	lightning->setPosition(SCALE_POS_FROM_UHD(227.f, 270.f, bgUhdSize, bgSize));
+	lightning->setScale(SCALE_VAL_FROM_UHD(0.425, bgUhdSize, bgSize));
 	lightning->setRotation(71);
 	lightning->restart(1.f / 17.f * 3.f);
 	lightning->setOpacity(0);
@@ -182,13 +196,16 @@ class RainMenuLayer : public CCLayer {
 		float scaleAnimationFadeDuration;
 		std::function<void()> callback;
 	};
+
+	auto treeSize = tree->getContentSize();
+	auto uhdTreeSize = CCSize(480.f, 270.f);
 	
 	std::vector<TreeButtonSettings> buttons = {
 		{
 			"createBtn.png"_spr,
 			"create",
-			{177.f, 259.f},
-			1.05f,
+			SCALE_POS_FROM_UHD(177.f, 259.f, uhdTreeSize, treeSize),
+			SCALE_VAL_FROM_UHD(1.05f, uhdTreeSize, treeSize),
 			4.f,
 			[]() {
 				auto cl = CreatorLayer::create();
@@ -198,8 +215,8 @@ class RainMenuLayer : public CCLayer {
 		{
 			"dailyBtn.png"_spr,
 			"daily",
-			{287.f, 223.f},
-			1.f,
+			SCALE_POS_FROM_UHD(287.f, 223.f, uhdTreeSize, treeSize),
+			SCALE_VAL_FROM_UHD(1.f, uhdTreeSize, treeSize),
 			3.5f,
 			[]() {
 				auto cl = CreatorLayer::create();
@@ -209,8 +226,8 @@ class RainMenuLayer : public CCLayer {
 		{
 			"eventBtn.png"_spr,
 			"event",
-			{369.f, 219.f},
-			0.95f,
+			SCALE_POS_FROM_UHD(369.f, 219.f, uhdTreeSize, treeSize),
+			SCALE_VAL_FROM_UHD(0.95f, uhdTreeSize, treeSize),
 			3.8f,
 			[]() {
 				auto cl = CreatorLayer::create();
@@ -220,8 +237,8 @@ class RainMenuLayer : public CCLayer {
 		{
 			"featuredBtn.png"_spr,
 			"featured",
-			{123.f, 243.f},
-			1.05f,
+			SCALE_POS_FROM_UHD(123.f, 243.f, uhdTreeSize, treeSize),
+			SCALE_VAL_FROM_UHD(1.05f, uhdTreeSize, treeSize),
 			3.2f,
 			[]() {
 				auto cl = CreatorLayer::create();
@@ -231,8 +248,8 @@ class RainMenuLayer : public CCLayer {
 		{
 			"gauntletsBtn.png"_spr,
 			"gauntlets",
-			{89.f, 125.f},
-			0.775f,
+			SCALE_POS_FROM_UHD(89.f, 125.f, uhdTreeSize, treeSize),
+			SCALE_VAL_FROM_UHD(0.775f, uhdTreeSize, treeSize),
 			4.1f,
 			[]() {
 				auto cl = CreatorLayer::create();
@@ -242,8 +259,8 @@ class RainMenuLayer : public CCLayer {
 		{
 			"iconsBtn.png"_spr,
 			"icons",
-			{265.f, 247.f},
-			0.9f,
+			SCALE_POS_FROM_UHD(265.f, 247.f, uhdTreeSize, treeSize),
+			SCALE_VAL_FROM_UHD(0.9f, uhdTreeSize, treeSize),
 			4.2f,
 			[]() {
 				auto scene = GJGarageLayer::scene();
@@ -253,8 +270,8 @@ class RainMenuLayer : public CCLayer {
 		{
 			"mainLevelsBtn.png"_spr,
 			"main levels",
-			{89.f, 171.f},
-			0.975f,
+			SCALE_POS_FROM_UHD(89.f, 171.f, uhdTreeSize, treeSize),
+			SCALE_VAL_FROM_UHD(0.975f, uhdTreeSize, treeSize),
 			4.5f,
 			[]() {
 				auto scene = LevelSelectLayer::scene(0);	
@@ -264,8 +281,8 @@ class RainMenuLayer : public CCLayer {
 		{
 			"mapPacksBtn.png"_spr,
 			"map packs",
-			{130.f, 91.f},
-			0.55f,
+			SCALE_POS_FROM_UHD(130.f, 91.f, uhdTreeSize, treeSize),
+			SCALE_VAL_FROM_UHD(0.55f, uhdTreeSize, treeSize),
 			4.6f,
 			[]() {
 				auto cl = CreatorLayer::create();
@@ -275,8 +292,8 @@ class RainMenuLayer : public CCLayer {
 		{
 			"onlineLevelsBtn.png"_spr,
 			"online levels",
-			{104.f, 208.f},
-			0.95f,
+			SCALE_POS_FROM_UHD(104.f, 208.f, uhdTreeSize, treeSize),
+			SCALE_VAL_FROM_UHD(0.95f, uhdTreeSize, treeSize),
 			4.8f,
 			[]() {
 				auto cl = CreatorLayer::create();
@@ -286,8 +303,8 @@ class RainMenuLayer : public CCLayer {
 		{
 			"optionsBtn.png"_spr,
 			"options",
-			{226.f, 252.f},
-			0.9f,
+			SCALE_POS_FROM_UHD(226.f, 252.f, uhdTreeSize, treeSize),
+			SCALE_VAL_FROM_UHD(0.9f, uhdTreeSize, treeSize),
 			3.3f,
 			[]() {
 				auto optionsLayer = OptionsLayer::create();
@@ -298,8 +315,8 @@ class RainMenuLayer : public CCLayer {
 		{
 			"questsBtn.png"_spr,
 			"quests",
-			{146.f, 258.f},
-			0.475f,
+			SCALE_POS_FROM_UHD(146.f, 258.f, uhdTreeSize, treeSize),
+			SCALE_VAL_FROM_UHD(0.475f, uhdTreeSize, treeSize),
 			3.9f,
 			[]() {
 				ChallengesPage::create()->show();
@@ -308,8 +325,8 @@ class RainMenuLayer : public CCLayer {
 		{
 			"savedLevelsBtn.png"_spr,
 			"saved levels",
-			{132.f, 120.f},
-			0.625f,
+			SCALE_POS_FROM_UHD(132.f, 120.f, uhdTreeSize, treeSize),
+			SCALE_VAL_FROM_UHD(0.625f, uhdTreeSize, treeSize),
 			4.2f,
 			[]() {
 				auto cl = CreatorLayer::create();
@@ -319,8 +336,8 @@ class RainMenuLayer : public CCLayer {
 		{
 			"topBtn.png"_spr,
 			"top",
-			{376.f, 183.f},
-			0.825f,
+			SCALE_POS_FROM_UHD(376.f, 183.f, uhdTreeSize, treeSize),
+			SCALE_VAL_FROM_UHD(0.825f, uhdTreeSize, treeSize),
 			5.f,
 			[]() {
 				auto cl = CreatorLayer::create();
@@ -330,8 +347,8 @@ class RainMenuLayer : public CCLayer {
 		{
 			"weeklyBtn.png"_spr,
 			"weekly",
-			{328.f, 239.f},
-			1.f,
+			SCALE_POS_FROM_UHD(328.f, 239.f, uhdTreeSize, treeSize),
+			SCALE_VAL_FROM_UHD(1.f, uhdTreeSize, treeSize),
 			3.7f,
 			[]() {
 				auto cl = CreatorLayer::create();
@@ -341,14 +358,14 @@ class RainMenuLayer : public CCLayer {
 		{
 			"modsBtn.png"_spr,
 			"mods",
-			{342.f, 101.f},
-			0.8f,
+			SCALE_POS_FROM_UHD(342.f, 101.f, uhdTreeSize, treeSize),
+			SCALE_VAL_FROM_UHD(0.8f, uhdTreeSize, treeSize),
 			3.6f,
 			[]() {
 				geode::openModsList();
 			}
 		}
-	};
+		};
 
 		auto menu = CCMenu::create();
 		menu->setPosition({ 0.f, 0.f });
@@ -364,7 +381,21 @@ class RainMenuLayer : public CCLayer {
 
 		this->schedule(schedule_selector(RainMenuLayer::startLightning), 10);
 
+		auto exitMenu = CCMenu::create();
+		exitMenu->setPosition({ 0.f, 0.f });
+		this->addChild(exitMenu, EXIT_MENU_Z_ORDER);
+
+		auto exitLabel = CCLabelBMFont::create("exit", "lemonmilk.fnt"_spr);
+		exitLabel->setOpacity(50);
+		auto exitBtn = CCMenuItemSpriteExtra::create(exitLabel, this, menu_selector(RainMenuLayer::onQuit));
+		exitBtn->setPosition({ 25.f, size.height - 20.f });
+		exitMenu->addChild(exitBtn);
+
 		return true;
+	}
+
+	void onQuit(CCObject*) {
+		CCDirector::get()->end();
 	}
 
 	void startLightning(float dt) {
