@@ -51,11 +51,11 @@ class $modify(MenuLayer) {
 	bool init() {
 		if (!MenuLayer::init()) return false;
 
-		CCScene::get()->addChild(MenuLayerManager::getNode());
+		this->getParent()->addChild(MenuLayerManager::getNode());
 
 		RainMenuLayer* rainLayer = RainMenuLayer::create();
 		rainLayer->setID("RainMenuLayer"_spr);
-		CCScene::get()->addChild(rainLayer);
+		this->getParent()->addChild(rainLayer);
 		rainLayer->setZOrder(1);
 
 		bool hideOriginalMenuLayer = MenuLayerManager::getState();
