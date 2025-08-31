@@ -11,7 +11,6 @@ class $modify(GameManager) {
 
 class MenuLayerManager {
 	static bool originalMenuLayer;
-	CCLabelBMFont* switcherLabel;
 
 	void reloadMenuLayerAndToggleState(CCObject*) {
 		CCScene* scene = CCScene::get();
@@ -23,7 +22,11 @@ class MenuLayerManager {
 		originalMenuLayer = !originalMenuLayer;
 		menuLayer->setVisible(originalMenuLayer);
 		rainMenuLayer->setVisible(!originalMenuLayer);
-		switcherLabel->setString(originalMenuLayer ? "to rain layer" : "to original layer");
+
+		CCNode* switcherLabel = scene->querySelector("rainixdev.rainmenu/rain-menu-menu > rainixdev.rainmenu/rain-menu-toggle > rainixdev.rainmenu/rain-menu-toggle-label");
+		if (!switcherLabel) return;
+
+		static_cast<CCLabelBMFont*>(switcherLabel)->setString(originalMenuLayer ? "to rain layer" : "to original layer");
 	}
 
 public:
@@ -35,7 +38,6 @@ public:
 		menuLayerSwitcherLabel->setOpacity(30);
 		menuLayerSwitcherLabel->setScale(0.3f);
 		menuLayerSwitcherLabel->setID("rain-menu-toggle-label"_spr);
-		switcherLabel = menuLayerSwitcherLabel;
 		auto menuLayerSwitcherBtn = CCMenuItemSpriteExtra::create(menuLayerSwitcherLabel, menuLayerSwitcherMenu, menu_selector(MenuLayerManager::reloadMenuLayerAndToggleState));
 		menuLayerSwitcherBtn->setPosition({ 30.f, 5.f });
 		menuLayerSwitcherBtn->setID("rain-menu-toggle"_spr);
