@@ -1,0 +1,29 @@
+{
+	"geode": "4.4.0",
+	"gd": {
+		"win": "2.2074",
+		"android": "2.2074"
+	},
+	"id": "rainixdev.rainmenu",
+	"name": "RainMenu",
+	"version": "v1.0.0",
+	"developer": "rainixdev",
+	"description": "",
+	"resources": {
+		"spritesheets": {
+			"Icons": [ "assets/icons/*.png" ],
+			"Lightning": [ "assets/lightning/*.png" ],
+			"Clouds":  ["assets/clouds/*.png"]
+		},
+		"fonts": {
+			"Lemonmilk": {
+				"path": "assets/lemonmilk.otf",
+				"size": 64
+			}
+		},
+		"files": [
+			"assets/*.png",
+			"assets/*.mp3"
+		]
+	}
+}
