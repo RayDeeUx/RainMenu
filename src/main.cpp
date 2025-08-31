@@ -13,8 +13,15 @@ class MenuLayerManager {
 	static bool originalMenuLayer;
 
 	void reloadMenuLayerAndToggleState(CCObject*) {
+		CCScene* scene = CCScene::get();
+		if (!scene) return;
+		auto menuLayer = scene->getChildByID("MenuLayer");
+		auto rainMenuLayer = scene->getChildByID("RainMenuLayer"_spr);
+		if (!menuLayer || !rainMenuLayer) return;
+
 		originalMenuLayer = !originalMenuLayer;
-		CCDirector::get()->replaceScene(CCTransitionFade::create(0.3f, MenuLayer::scene(false)));
+		menuLayer->setVisible(originalMenuLayer);
+		rainMenuLayer->setVisible(!originalMenuLayer);
 	}
 public:
 	static CCNode* getNode(){	
@@ -26,7 +33,9 @@ public:
 		menuLayerSwitcherLabel->setScale(0.3f);
 		auto menuLayerSwitcherBtn = CCMenuItemSpriteExtra::create(menuLayerSwitcherLabel, menuLayerSwitcherMenu, menu_selector(MenuLayerManager::reloadMenuLayerAndToggleState));
 		menuLayerSwitcherBtn->setPosition({ 30.f, 5.f });
+		menuLayerSwitcherBtn->setID("rain-menu-toggle"_spr);
 		menuLayerSwitcherMenu->addChild(menuLayerSwitcherBtn);
+		menuLayerSwitcherMenu->setID("rain-menu-menu"_spr);
 
 		return menuLayerSwitcherMenu;
 	}
@@ -39,21 +48,19 @@ bool MenuLayerManager::originalMenuLayer = false;
 
 
 class $modify(MenuLayer) {
-	static cocos2d::CCScene* scene(bool isVideoOptionsOpen) {
-		if (MenuLayerManager::getState()) return MenuLayer::scene(isVideoOptionsOpen);
-
-		auto scene = CCScene::create();
-		auto layer = RainMenuLayer::create();
-
-		layer->addChild(MenuLayerManager::getNode(), 50);
-
-		scene->addChild(layer);
-		return scene;
-	}
 	bool init() {
 		if (!MenuLayer::init()) return false;
 
-		this->addChild(MenuLayerManager::getNode());
+		CCScene::get()->addChild(MenuLayerManager::getNode());
+
+		RainMenuLayer* rainLayer = RainMenuLayer::create();
+		rainLayer->setID("RainMenuLayer"_spr);
+		CCScene::get()->addChild(rainLayer);
+		rainLayer->setZOrder(1);
+
+		bool hideOriginalMenuLayer = MenuLayerManager::getState();
+		this->setVisible(hideOriginalMenuLayer);
+		rainLayer->setVisible(!hideOriginalMenuLayer);
 
 		return true;
 	}
