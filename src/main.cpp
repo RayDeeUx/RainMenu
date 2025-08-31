@@ -59,6 +59,7 @@ class $modify(MenuLayer) {
 		CCScene* scene = MenuLayer::scene(isVideoOptionsOpen);
 
 		auto layer = RainMenuLayer::create();
+		layer->setID("RainMenuLayer"_spr);
 		scene->addChild(layer);
 		scene->addChild(MenuLayerManager::getNode());
 
