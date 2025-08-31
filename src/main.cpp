@@ -44,14 +44,16 @@ bool MenuLayerManager::originalMenuLayer = false;
 
 class $modify(MenuLayer) {
 	static cocos2d::CCScene* scene(bool isVideoOptionsOpen) {
-        auto scene = MenuLayer::scene(isVideoOptionsOpen);
-        auto menuLayer = scene->getChildByType<MenuLayer>(0);
-        menuLayer->setVisible(false);
-        auto layer = RainMenuLayer::create();
-        scene->addChild(layer);
-        layer->idkDoSomeToggleThingForMenuLayer(menuLayer);
-        return scene;
-    }
+		if (MenuLayerManager::getState()) return MenuLayer::scene(isVideoOptionsOpen);
+
+		auto scene = CCScene::create();
+		auto layer = RainMenuLayer::create();
+
+		layer->addChild(MenuLayerManager::getNode(), 50);
+
+		scene->addChild(layer);
+		return scene;
+	}
 	bool init() {
 		if (!MenuLayer::init()) return false;
 
